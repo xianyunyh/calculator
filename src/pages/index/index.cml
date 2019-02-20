@@ -1,0 +1,159 @@
+<template>
+  <page title="Mortgage calculator">
+  <view>
+     <view class="title">
+       <text class="title">Mortgage calculator</text>
+       </view>
+     <c-tab tabs="{{tabs}}"
+     c-bind:tabclick="handleTabTap"
+     active-label="{{activeLabel}}"
+     inline="{{false}}"
+     >
+     </c-tab>
+     <c-tab-pane tabs="{{tabs}}"  active-label="{{activeLabel}}">
+       <c-tab-pane-item>
+        <view class="one">
+            <text class="title-text">Monthly payments:</text>
+            <view class="end-item">
+              <input type="digit" c-style="border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0" ></input>
+            </view>
+            <text class="title-text">Interest rate (%)：</text>
+            <view class="end-item">
+              <input type="digit" c-style="border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0" ></input>
+            </view>
+            <text class="title-text">Mortgage period (years):</text>
+            <view >
+              <input type="digit" c-bind:tap="showClick" readonly value="{{provins[columnIndex]}}" return-key-type="go" c-style="border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0" ></input>
+              <c-picker
+                show="{{pickerShow}}"
+                title="请选择"
+                header-height="{{100}}"
+                data-height="{{400}}"
+                data="{{provins}}"
+                default-index="{{defaultIndex}}"
+                c-bind:cancel="cancel"
+                c-bind:confirm="confirm"
+                c-bind:selectchange="selectchange">
+              </c-picker>
+            </view>
+            <view style="border-bottom:1cpx solid #ccc;padding:20cpx 0;">
+              <text class="title-text" style="margin-top:20cpx">Total cost of mortgage</text>
+              <view class="end-item">
+                <text>You could borrow</text>
+              </view>
+            </view>
+            <view style="border-top:1cpx solid #ccc;padding:20cpx 0;">
+              <text class="title-text" style="margin-top:20cpx;color:#ccc">10000</text>
+              <view class="end-item">
+                <text style="font-size:24px">${{total}}</text>
+              </view>
+            </view>
+        </view>
+       </c-tab-pane-item>
+       <c-tab-pane-item>
+        <view class="two">
+          
+        </view>
+       </c-tab-pane-item>
+     </c-tab-pane>
+  </view>
+</page>
+</template>
+
+<script>
+
+class CTab {
+  data = {
+    provins: [
+      "北京市",
+      "天津市",
+    ],
+    defaultIndex: 0,
+    columnIndex: 0,
+    pickerShow: false,
+    headerTitle: 'c-tabs',
+    headerDesc: 'c-tabs',
+    tabs:[{
+      label:'Monthly cost',
+      //prefixStyle:"width:50cpx;height:20cpx;background-color:red"
+    },{
+      label:"Maximum loan",
+      //suffixStyle:"width:50cpx;height:20cpx;background-color:red"
+    }],
+    activeLabel:'label1',
+    total: 1000,
+  }
+  methods = {
+    handleTabTap(e){
+      console.log(e);
+      this.activeLabel = e.detail.label;
+    },
+    handleTabTapAlone(e){
+      this.activeLabelAlone = e.detail.label;
+    },
+    selectchange(e) {
+      this.columnIndex = this.defaultIndex = e.detail.index;
+    },
+    showClick() {
+      this.pickerShow = true;
+    },
+    cancel() {
+      this.pickerShow = false;
+    },
+    confirm() {
+      this.pickerShow = false;
+    }
+  }
+}
+export default new CTab();
+
+</script>
+<style scoped>
+.title{
+  display:flex;
+  flex-direction:row;
+  justify-content:center;
+  line-height: 88cpx;
+  font-size: 28cpx;
+  text-align: center;
+  height: 88cpx;
+  color: #999;
+}
+.title-text{
+  margin-top:5cpx;
+}
+.end-item .input-demo{
+  border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0
+}
+.one{
+  padding:10px;
+}
+.select-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32cpx;
+  text-align: center;
+}
+</style>
+<script cml-type="json">
+{
+  "base":{
+    "navigationBarTitleText": "tab-pane",
+     "backgroundTextStyle": "dark",
+     "backgroundColor": "#E2E2E2",
+     "usingComponents": {
+          "c-picker": "cml-ui/components/c-picker/c-picker",
+          "c-tab": "cml-ui/components/c-tab/c-tab",
+          "c-tab-pane": "cml-ui/components/c-tab-pane/c-tab-pane",
+          "c-tab-pane-item": "cml-ui/components/c-tab-pane-item/c-tab-pane-item",
+          "c-picker-item": "cml-ui/components/c-picker-item/c-picker-item"
+      }
+  },
+  "wx": {
+    "navigationBarTitleText": "index",
+    "backgroundTextStyle": "dark",
+    "backgroundColor": "#E2E2E2"
+  }
+}
+</script>
