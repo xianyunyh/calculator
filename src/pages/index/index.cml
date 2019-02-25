@@ -9,35 +9,45 @@
      <c-tab-pane tabs="{{tabs}}"  active-label="{{activeLabel}}">
        <c-tab-pane-item>
         <view class="one">
-            <text class="title-text">Monthly payments:</text>
-            <view class="end-item">
-              <input type="digit" c-model="{{monthly_pay}}" c-style="border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0" ></input>
-            </view>
-            <text class="title-text">Interest rate (%)：</text>
-            <view class="end-item">
-              <input type="digit" c-model="{{rate}}" c-style="border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0" ></input>
-            </view>
-            <text class="title-text">Mortgage period (years):</text>
-            <view >
-              <text c-bind:tap="showClick" c-model="{{select_year}}" style="padding:10px;border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0" >{{years[columnIndex]}}</text>
-            </view>
-            <view style="border-bottom:1cpx solid #ccc;padding:20cpx 0;">
-              <text class="title-text" style="margin-top:20cpx">Total cost of mortgage</text>
-              <view class="end-item">
-                <text>You could borrow</text>
-              </view>
-            </view>
-            <view style="border-top:1cpx solid #ccc;padding:20cpx 0;">
-              <text class="title-text" style="margin-top:20cpx;color:#ccc">10000</text>
-              <view class="end-item">
-                <text style="font-size:24px">${{total}}</text>
-              </view>
-            </view>
+            
         </view>
        </c-tab-pane-item>
        <c-tab-pane-item>
-        <view class="two">
-          
+        <view class="one">
+          <text class="title-text">商业贷款(万元)：</text>
+            <view class="end-item">
+              <input type="number" c-bind:blur="checkNumber" c-model="{{money}}" c-style="border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0" ></input>
+            </view>
+            <text class="title-text">商业贷款年利率(%)：</text>
+            <view class="end-item">
+              <input type="digit"  c-bind:blur="checkNumber" c-model="{{rate}}" c-style="border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0" ></input>
+            </view>
+            <text class="title-text">贷款年限(年):</text>
+            <view >
+              <text  c-bind:blur="checkNumber" c-bind:tap="showClick" c-model="{{select_year}}" style="padding:10px;border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0" >{{years[columnIndex]}}</text>
+            </view>
+            <view style="border-bottom:1cpx solid #ccc;padding:20cpx 0;">
+              <text class="title-text" style="margin-top:20cpx">还款方式</text>
+                <c-radio-group
+                option="{{ types }}"
+                horizontal="{{true}}"
+                c-bind:groupchange="handleTypesSelect"
+                >
+                </c-radio-group>
+            </view>
+            <view style="border-top:1cpx solid #ccc;padding:20cpx 0;">
+              <view class="end-item">
+                <text style="font-size:22px">每个月还款:￥{{monthly_pay}}</text>
+              </view>
+            </view>
+            <view style="border-top:1cpx solid #ccc;padding:20cpx 0;">
+        
+             <text  style="margin-top:20cpx;color:#ccc">累计支付利息:{{total_interest}}</text>
+     
+              <view class="end-item">
+                <text style="font-size:22px">累计还款:￥{{total}}</text>
+              </view>
+            </view>
         </view>
        </c-tab-pane-item>
      </c-tab-pane>
@@ -53,6 +63,15 @@
       c-bind:confirm="confirm"
       c-bind:selectchange="selectchange">
     </c-picker>
+  </view>
+   <view class="toast-page">
+    <c-dialog show="{{show}}"
+              title="标题"
+              mask="{{true}}"
+              c-bind:confirm="handleConfirm"
+              content="输入的内容不是数字"
+    >
+    </c-dialog>
   </view>
 </page>
 </template>
@@ -70,26 +89,70 @@ class CTab {
     ],
     defaultIndex: 0,
     columnIndex: 0,
+    money:"",
     pickerShow: false,
+    type: 1,
     headerTitle: 'c-tabs',
     headerDesc: 'c-tabs',
+    show:false,
+    alertContent:"",
     tabs:[{
       label:'Monthly cost',
     },{
-      label:"Maximum loan",
+      label:"商业贷款",
     }],
     activeLabel:'label1',
     rate: "3.5",
     select_year: "5",
-    monthly_pay: "500",
+    types: [{
+      checked: true,
+      label: '等额本息',
+      value:1,
+      disabled: false
+    }, {
+      checked: false,
+      value:2,
+      label: '等额本金'
+    }]
   }
   computed = {
     // 计算属性的 getter
-    total: function () {
-      return this.monthly_pay * this.select_year * this.rate
+    monthly_pay: function () {
+      let type = this.type 
+      console.log(this.select_year)
+      let R = (this.rate /100)/ 12;
+      let N = this.select_year * 12
+      let P = this.money * 10000
+      let p = Math.pow(1+R,N)
+      if (type == 1) {
+        return  Math.floor(P * ((R*p)/(p-1)),2)
+      }
+      return 0;
+    },
+    total :function(){
+      let N = this.select_year * 12
+      return this.monthly_pay * N || 0
+    },
+    total_interest:function(){
+      let p = this.money * 10000;
+      return this.total - p
     }
   }
   methods = {
+    checkNumber(e){
+      console.log(e)
+      let value = Number(e.detail.value)
+      let isNumber = typeof value === 'number' && !isNaN(value)
+      if(!isNumber) {
+          this.show = true
+      }
+    },
+     valueChange (e) {
+      this.radioValue = e.detail.value;
+    },
+    handleConfirm(){
+      this.show = false;
+    },
     handleTabTap(e){
       this.activeLabel = e.detail.label;
     },
@@ -108,6 +171,9 @@ class CTab {
     },
     confirm() {
       this.pickerShow = false;
+    },
+    handleTypesSelect(e){
+      this.type = this.types[e.detail.index].value
     }
   }
 }
@@ -156,7 +222,9 @@ export default new CTab();
           "c-tab": "cml-ui/components/c-tab/c-tab",
           "c-tab-pane": "cml-ui/components/c-tab-pane/c-tab-pane",
           "c-tab-pane-item": "cml-ui/components/c-tab-pane-item/c-tab-pane-item",
-          "c-picker-item": "cml-ui/components/c-picker-item/c-picker-item"
+          "c-picker-item": "cml-ui/components/c-picker-item/c-picker-item",
+          "c-dialog": "cml-ui/components/c-dialog/c-dialog",
+          "c-radio-group": "cml-ui/components/c-radio-group/c-radio-group"
       }
   },
   "wx": {
