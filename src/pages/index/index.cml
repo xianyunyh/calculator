@@ -25,6 +25,11 @@
             <view >
               <text  c-bind:tap="showSocial" c-model="{{extend}}" style="padding:10px;border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0" >{{extend[columnIndex]}}</text>
             </view>
+            <view style="border-top:1cpx solid #ccc;padding:20cpx 0;">
+              <view class="end-item">
+                <text style="font-size:22px">每个月还款:￥{{after_money}}</text>
+              </view>
+            </view>
         </view>
        </c-tab-pane-item>
        <c-tab-pane-item>
@@ -171,9 +176,55 @@ class CTab {
     total_interest:function(){
       let p = this.money * 10000;
       return this.total - p
+    },
+    after_money:function(){
+      let before_money = this.tax.pre_money;
+      const rateData = this.getRateAndMoney(before_money);
+      console.log(rateData)
+      return  before_money - (before_money-rateData.money)*0.3 || 0
     }
   }
   methods = {
+
+    getRateAndMoney(money){
+        money = Number(money) || 0;
+        if(money <=36000) {
+          return {
+            rate: "3%",
+            money:0,
+          }
+        } else if(money <= 144000) {
+          return {
+            rate:"10%",
+            money:2520
+          }
+        }else if(money <= 300000) {
+          return {
+            rate:"20%",
+            money:16920
+          }
+        }else if(money <= 420000) {
+          return {
+            rate:"25%",
+            money:31920
+          }
+        }else if(money <= 660000) {
+          return {
+            rate:"30%",
+            money:52920
+          }
+        }else if(money <= 960000) {
+          return {
+            rate:"35%",
+            money:85920
+          }
+        }else{
+          return {
+            rate:"45%",
+            money:181920
+          }
+        }
+    },
     checkNumber(e){
       console.log(e)
       let value = Number(e.detail.value)
