@@ -36,7 +36,7 @@
         <view class="one">
           <text class="title-text">商业贷款(万元)：</text>
             <view class="end-item">
-              <input type="number" c-bind:blur="checkNumber" c-model="{{money}}" c-style="border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0" ></input>
+              <input type="digit"  c-model="{{money}}" c-style="border-bottom: 2px solid #ccc;border-top:none;border-left:none;border-right:none;border-radius:0" ></input>
             </view>
             <text class="title-text">商业贷款年利率(%)：</text>
             <view class="end-item">
@@ -49,7 +49,7 @@
             <view style="border-bottom:1cpx solid #ccc;padding:20cpx 0;">
               <text class="title-text" style="margin-top:20cpx">还款方式</text>
                 <c-radio-group
-                option="{{ types }}"
+                option="{{types}}"
                 horizontal="{{true}}"
                 c-bind:groupchange="handleTypesSelect"
                 >
@@ -129,7 +129,7 @@ class CTab {
     ],
     defaultIndex: 0,
     columnIndex: 0,
-    money:"",
+    money:"0",
     pickerShow: false,
     type: 1,
     headerTitle: 'c-tabs',
@@ -226,12 +226,7 @@ class CTab {
         }
     },
     checkNumber(e){
-      console.log(e)
-      let value = Number(e.detail.value)
-      let isNumber = typeof value === 'number' && !isNaN(value)
-      if(!isNumber) {
-          this.show = true
-      }
+      
     },
      valueChange (e) {
       this.radioValue = e.detail.value;
